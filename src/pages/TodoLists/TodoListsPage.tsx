@@ -1,36 +1,83 @@
-import React, {useEffect} from 'react';
-import {Box, Checkbox, Grid, IconButton, Tooltip, Typography} from "@mui/material";
-import {useAppDispatch} from "../../hooks/redux";
-import {getMe} from "../../store/todolist/todolist.thunks";
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
-import DropDown from "../../components/Common/DropDown/DropDown";
-import TodoList from "../../components/TodoLists/TodoList/TodoList";
+import React, {useCallback, useEffect, useState} from 'react';
+import {Box} from "@mui/material";
+import {useAppDispatch, useAppSelector} from "../../hooks/redux";
+import {
+    createTask,
+    createTodo,
+    deleteTask,
+    deleteTodo,
+    getMe,
+    getTodoLists
+} from "../../store/todolist/todolist.thunks";
+import TodoLists from "../../components/TodoLists/TodoLists";
+import {TodoPayloadType} from "../../types/types";
+import {getTodoListsSelector, getTodoTasksSelector} from "../../store/todolist/todolist.selectors";
 
-const TodoLists = () => {
+const TodoListsPage = () => {
+    const todoLists = useAppSelector(getTodoListsSelector);
+    const tasks = useAppSelector(getTodoTasksSelector);
+
+    const [openTodoInput, setOpenTodoInput] = useState(false)
+    const [openTaskInput, setOpenTaskInput] = useState(false)
+
     const dispatch = useAppDispatch()
 
     useEffect(() => {
         dispatch(getMe())
+        dispatch(getTodoLists())
+    }, [])
+
+
+    const handleOpenTodoInput = useCallback(() => {
+        setOpenTodoInput(true)
+    }, [])
+
+    const handleCloseTodoInput = useCallback(() => {
+        setOpenTodoInput(false)
+    }, [])
+
+    const handleOpenTaskInput = useCallback(() => {
+        setOpenTaskInput(true)
+    }, [])
+
+    const handleCloseTaskInput = useCallback(() => {
+        setOpenTaskInput(false)
+    }, [])
+
+    const handleSubmitAddTodo = useCallback((data: TodoPayloadType) => {
+        dispatch(createTodo(data))
+        handleCloseTodoInput()
+    }, [])
+
+    const handleSubmitAddTask = useCallback((data: Record<string, any>, id: string) => {
+        dispatch(createTask({data, id}))
+    }, [])
+
+    const handleDeleteTodo = useCallback((id: string) => {
+        dispatch(deleteTodo(id))
+    }, [])
+
+    const handleDeleteTask = useCallback((todolistId: string, taskId: string) => {
+        dispatch(deleteTask({todolistId, taskId}))
     }, [])
 
     return (
-        <Box p={3} sx={{backgroundColor: '#edf1fb', width: '100%', height: '100vh'}}>
-            <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                <Box>
-                    <Typography fontSize='20px' fontWeight='600'>Hello Maks 👋🏻</Typography>
-                </Box>
-                <Tooltip title='Add todo'>
-                    <Box>
-                        <IconButton sx={{width: '40px', height: '40px'}}>+</IconButton>
-                    </Box>
-                </Tooltip>
-            </Box>
-            <Grid p={3} mt={3} container gap={2} sx={{display: 'flex', justifyContent: 'center'}}>
-                <TodoList/>
-            </Grid>
+        <Box>
+            <TodoLists
+                handleCloseTodoInput={handleCloseTodoInput}
+                handleCloseTaskInput={handleCloseTaskInput}
+                deleteTodo={handleDeleteTodo} todoLists={todoLists}
+                handleSubmitAddTodo={handleSubmitAddTodo}
+                openTodoInput={openTodoInput}
+                handleOpenTodoInput={handleOpenTodoInput}
+                handleOpenTaskInput={handleOpenTaskInput}
+                openTaskInput={openTaskInput}
+                tasks={tasks}
+                handleSubmitAddTask={handleSubmitAddTask}
+                handleDeleteTask={handleDeleteTask}
+            />
         </Box>
     );
 };
 
-export default React.memo(TodoLists);
+export default React.memo(TodoListsPage);

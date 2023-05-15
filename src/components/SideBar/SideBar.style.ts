@@ -1,6 +1,6 @@
-import { CSSObject, Theme } from '@mui/material';
-import { StylesRecord } from '../../interfaces/Styles';
-import { SIDE_BAR_WIDTH, SIDE_BAR_WIDTH_CLOSED } from '../../mui/constants';
+import {CSSObject, styled, Theme} from '@mui/material';
+import {StylesRecord} from '../../interfaces/Styles';
+import {SIDE_BAR_WIDTH, SIDE_BAR_WIDTH_CLOSED} from '../../mui/constants';
 
 const openedMixin = (theme: Theme): CSSObject => ({
     width: SIDE_BAR_WIDTH,
@@ -43,5 +43,16 @@ const sx: StylesRecord = {
         '& .MuiDrawer-paper': closedMixin(theme),
     }),
 };
+
+export const LogoImg = styled('div')(
+    () => `
+    display: flex;
+    alignItems: center;
+  img {
+    width: 50px;
+    height: 50px;
+  }
+`
+);
 
 export default sx;
